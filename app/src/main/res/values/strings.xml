@@ -1,4 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Spotiboost</string>
+
+    <string name="open_settings">Open settings</string>
+    <string name="not_now">Not now</string>
+
+    <string name="update_available_title">Update available</string>
+    <string name="update_available_desc">Version %1$s is available (you have %2$s).</string>
+    <string name="update_install">Install</string>
+    <string name="update_later">Later</string>
+    <string name="update_downloading">Downloading the update…</string>
+    <string name="update_allow_install">Allow Spotiboost to install apps, then open it again</string>
+    <string name="update_failed">Could not install it from the app, opening the download link</string>
+
+    <string name="notif_off_title">Notifications are off</string>
+    <string name="notif_off_msg">Without notifications you won\'t see the music controls on the lock screen. Turn them on in the app settings.</string>
+
+    <string name="power_save_title">Battery saver is on</string>
+    <string name="power_save_msg">It can cut or pause the music when the screen turns off or the app goes to the background. Turn it off so it isn\'t interrupted.</string>
+
+    <string name="playback_channel">Playback</string>
+    <string name="media_prev">Previous</string>
+    <string name="media_pause">Pause</string>
+    <string name="media_play">Play</string>
+    <string name="media_next">Next</string>
 </resources>

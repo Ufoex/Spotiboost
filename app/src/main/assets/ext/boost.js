@@ -1,6 +1,17 @@
 (function () {
   if (window.__sbBoost) return;
   window.__sbBoost = 1;
+  // UI text of the injected interface, in the phone's language (Spotify's own text already follows the account).
+  var TXT = {
+    es: { home: 'Inicio', search: 'Buscar', library: 'Biblioteca', nowPlaying: 'En reproducci\u00f3n', close: 'Cerrar', like: 'Me gusta',
+          shuffle: 'Aleatorio', prev: 'Anterior', play: 'Reproducir', next: 'Siguiente', repeat: 'Repetir',
+          devices: 'Dispositivos', lyrics: 'Letra', queue: 'Cola' },
+    en: { home: 'Home', search: 'Search', library: 'Library', nowPlaying: 'Now playing', close: 'Close', like: 'Like',
+          shuffle: 'Shuffle', prev: 'Previous', play: 'Play', next: 'Next', repeat: 'Repeat',
+          devices: 'Devices', lyrics: 'Lyrics', queue: 'Queue' }
+  };
+  var L = /^es/i.test(navigator.language || '') ? TXT.es : TXT.en;
+  function t(k) { return L[k]; }
   // Spotify's class names are hashed per build, so select by data-testid / structure only.
   var GRID = 'div:has(> [data-testid="global-nav-bar"])';
   var css = `
@@ -143,7 +154,7 @@
     var bar = document.querySelector('[data-testid="global-nav-bar"]');
     if (!bar || document.getElementById('sb-lib-btn')) return;
     var b = document.createElement('button');
-    b.id = 'sb-lib-btn'; b.textContent = '☰'; b.setAttribute('aria-label', 'Biblioteca');
+    b.id = 'sb-lib-btn'; b.textContent = '☰'; b.setAttribute('aria-label', t('library'));
     b.onclick = function () { document.body.classList.toggle('sb-lib'); };
     bar.insertBefore(b, bar.firstChild);
   }
@@ -199,14 +210,14 @@
     if (hasNpUi() || !document.body) return;
     var d = document.createElement('div'); d.id = 'sb-np';
     d.innerHTML =
-      '<div class="sb-top"><button data-a="close" aria-label="Cerrar">' + IC.down + '</button><span>En reproducción</span><span style="width:40px"></span></div>' +
+      '<div class="sb-top"><button data-a="close" aria-label="' + t('close') + '">' + IC.down + '</button><span>' + t('nowPlaying') + '</span><span style="width:40px"></span></div>' +
       '<div class="sb-cover"><img alt=""></div>' +
-      '<div class="sb-meta"><div><div class="sb-title"></div><div class="sb-artist"></div></div><button data-a="like" aria-label="Me gusta">' + IC.like + '</button></div>' +
+      '<div class="sb-meta"><div><div class="sb-title"></div><div class="sb-artist"></div></div><button data-a="like" aria-label="' + t('like') + '">' + IC.like + '</button></div>' +
       '<input type="range" min="0" max="1" value="0" step="1000"><div class="sb-times"><span class="sb-pos">0:00</span><span class="sb-dur">0:00</span></div>' +
-      '<div class="sb-ctl"><button data-a="shuffle" aria-label="Aleatorio">' + IC.shuf + '</button><button data-a="prev" aria-label="Anterior">' + IC.prev + '</button>' +
-      '<button data-a="play" class="sb-play" aria-label="Reproducir">' + IC.play + '</button><button data-a="next" aria-label="Siguiente">' + IC.next + '</button>' +
-      '<button data-a="repeat" aria-label="Repetir">' + IC.rep + '</button></div>' +
-      '<div class="sb-bot"><button data-a="connect" aria-label="Dispositivos">' + IC.dev + '</button><button data-a="lyrics" aria-label="Letra">' + IC.lyr + '</button><button data-a="queue" aria-label="Cola">' + IC.queue + '</button></div>';
+      '<div class="sb-ctl"><button data-a="shuffle" aria-label="' + t('shuffle') + '">' + IC.shuf + '</button><button data-a="prev" aria-label="' + t('prev') + '">' + IC.prev + '</button>' +
+      '<button data-a="play" class="sb-play" aria-label="' + t('play') + '">' + IC.play + '</button><button data-a="next" aria-label="' + t('next') + '">' + IC.next + '</button>' +
+      '<button data-a="repeat" aria-label="' + t('repeat') + '">' + IC.rep + '</button></div>' +
+      '<div class="sb-bot"><button data-a="connect" aria-label="' + t('devices') + '">' + IC.dev + '</button><button data-a="lyrics" aria-label="' + t('lyrics') + '">' + IC.lyr + '</button><button data-a="queue" aria-label="' + t('queue') + '">' + IC.queue + '</button></div>';
     document.body.appendChild(d);
     var dragging = false, seek = q1('input[type=range]', d);
     seek.addEventListener('pointerdown', function () { dragging = true; });
@@ -288,9 +299,9 @@
   setInterval(syncNp, 500);
   // ---- bottom navigation
   var NAV = [
-    ['home', 'Inicio', '<svg viewBox="0 0 24 24"><path d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3z"/></svg>'],
-    ['search', 'Buscar', '<svg viewBox="0 0 24 24"><path d="M10.5 3a7.5 7.5 0 0 1 5.9 12.1l4.3 4.3-1.4 1.4-4.3-4.3A7.5 7.5 0 1 1 10.5 3zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z"/></svg>'],
-    ['library', 'Biblioteca', '<svg viewBox="0 0 24 24"><path d="M4 4h2v16H4zM8 4h2v16H8zM12.4 5.2l1.9-.6 4.6 15.3-1.9.6z"/></svg>']
+    ['home', t('home'), '<svg viewBox="0 0 24 24"><path d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3z"/></svg>'],
+    ['search', t('search'), '<svg viewBox="0 0 24 24"><path d="M10.5 3a7.5 7.5 0 0 1 5.9 12.1l4.3 4.3-1.4 1.4-4.3-4.3A7.5 7.5 0 1 1 10.5 3zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z"/></svg>'],
+    ['library', t('library'), '<svg viewBox="0 0 24 24"><path d="M4 4h2v16H4zM8 4h2v16H8zM12.4 5.2l1.9-.6 4.6 15.3-1.9.6z"/></svg>']
   ];
   function buildNav() {
     if (q1('#sb-nav') || !document.body) return;

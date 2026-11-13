@@ -58,7 +58,7 @@ public class PlaybackService extends Service {
     public void onCreate() {
         instance = this;
         getSystemService(NotificationManager.class).createNotificationChannel(
-                new NotificationChannel(CH, "Reproducción", NotificationManager.IMPORTANCE_LOW));
+                new NotificationChannel(CH, getString(R.string.playback_channel), NotificationManager.IMPORTANCE_LOW));
         session = new MediaSession(this, "Spotiboost");
         session.setCallback(new MediaSession.Callback() {
             @Override public void onPlay() { if (gecko != null) gecko.play(); }
@@ -114,10 +114,10 @@ public class PlaybackService extends Service {
                 .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_IMMUTABLE))
                 .setOngoing(playing).setOnlyAlertOnce(true).setVisibility(Notification.VISIBILITY_PUBLIC)
-                .addAction(new Notification.Action.Builder(Icon.createWithResource(this, android.R.drawable.ic_media_previous), "Anterior", act(A_PREV, 1)).build())
+                .addAction(new Notification.Action.Builder(Icon.createWithResource(this, android.R.drawable.ic_media_previous), getString(R.string.media_prev), act(A_PREV, 1)).build())
                 .addAction(new Notification.Action.Builder(Icon.createWithResource(this,
-                        playing ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play), playing ? "Pausa" : "Reproducir", act(A_TOGGLE, 2)).build())
-                .addAction(new Notification.Action.Builder(Icon.createWithResource(this, android.R.drawable.ic_media_next), "Siguiente", act(A_NEXT, 3)).build())
+                        playing ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play), getString(playing ? R.string.media_pause : R.string.media_play), act(A_TOGGLE, 2)).build())
+                .addAction(new Notification.Action.Builder(Icon.createWithResource(this, android.R.drawable.ic_media_next), getString(R.string.media_next), act(A_NEXT, 3)).build())
                 .setStyle(new Notification.MediaStyle().setMediaSession(session.getSessionToken()).setShowActionsInCompactView(0, 1, 2))
                 .build();
         if (!foreground) { startForeground(ID, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK); foreground = true; }

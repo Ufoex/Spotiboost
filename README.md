@@ -8,6 +8,7 @@ No está afiliado a Spotify. Necesitas tu propia cuenta; el audio se reproduce c
 ## Qué hace
 - Interfaz móvil: barra inferior (Inicio, Buscar, Biblioteca), reproductor ampliado, cola, dispositivos y letra a pantalla completa.
 - Reproducción en segundo plano y con la pantalla apagada: servicio en primer plano, notificación y controles de la pantalla de bloqueo.
+- Inglés y español, según el idioma del teléfono.
 - Aviso si el ahorro de energía está activo o faltan las notificaciones, porque pueden cortar la música.
 
 ## Por qué GeckoView y no el WebView del sistema
@@ -31,11 +32,15 @@ Requiere JDK 17 y el SDK de Android (plataforma 36).
 La build debug se instala como "Spotiboost Debug" (`com.ufoex.spotiboost.gecko`), así que convive con la release (`com.ufoex.spotiboost`).
 
 ## Publicar una versión
-Crea una etiqueta y súbela; GitHub Actions compila y publica el APK en Releases:
+1. Añade arriba de `CHANGE.md` una sección `## Spotiboost vX.Y.Z` con los bloques `<!-- lang:en -->` y `<!-- lang:es -->`
+   (son las notas que muestra el release y el aviso de actualización de la app).
+2. Crea la etiqueta y súbela; GitHub Actions pasa los tests, compila y publica el APK en Releases:
 
 ```sh
-git tag v0.1.0 && git push origin v0.1.0
+git tag vX.Y.Z && git push origin vX.Y.Z
 ```
+
+La app busca al abrirse la última versión en GitHub y, si es más nueva que la instalada, ofrece descargarla e instalarla.
 
 Para firmar con tu propia clave, define en el repo los secretos `KEYSTORE_BASE64` (`base64 -w0 release.jks`), `KEYSTORE_PASSWORD`,
 `KEY_ALIAS` y `KEY_PASSWORD`. Sin ellos, el release se firma con la clave de depuración: instala, pero no actualiza encima de otra firma.

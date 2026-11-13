@@ -167,11 +167,11 @@ public class MainActivity extends Activity {
         if (code != 1 || (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED)) return;
         if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) return; // the system will ask again
         notificationsDialog = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-                .setTitle("Notificaciones desactivadas")
-                .setMessage("Sin notificaciones no ver\u00e1s los controles de la m\u00fasica en la pantalla de bloqueo. Act\u00edvalas en los ajustes de la app.")
-                .setPositiveButton("Abrir ajustes", (d, w) -> startActivity(new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .setTitle(R.string.notif_off_title)
+                .setMessage(R.string.notif_off_msg)
+                .setPositiveButton(R.string.open_settings, (d, w) -> startActivity(new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
                         .putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName())))
-                .setNegativeButton("Ahora no", null)
+                .setNegativeButton(R.string.not_now, null)
                 .setOnDismissListener(d -> notificationsDialog = null)
                 .show();
     }

@@ -52,9 +52,9 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
-            ./gradlew assembleRelease -PversionNameOverride="${GITHUB_REF_NAME#v}"
+            ./gradlew test assembleRelease -PversionNameOverride="${GITHUB_REF_NAME#v}"
           else
-            ./gradlew assembleDebug
+            ./gradlew test assembleDebug
           fi
 
       - name: Publish release
@@ -66,11 +66,19 @@ jobs:
           APK="Spotiboost-$VER.apk"
           cp app/build/outputs/apk/release/app-release.apk "$APK"
           sha256sum "$APK" > "$APK.sha256"
-          PREV=$(git describe --tags --abbrev=0 "$GITHUB_REF_NAME^" 2>/dev/null || true)
-          LOG=$(git log --no-merges --pretty='- %s' ${PREV:+"$PREV..$GITHUB_REF_NAME"})
-          NOTES="${LOG:-- Primera versión}"
-          NOTES="$NOTES"$'\n\n---\nInstala el APK (solo arm64). SHA-256 en el archivo .sha256.'
-          if [ "$SIGNED" = debug ]; then
-            NOTES="$NOTES"$'\n\n'"Firmado con la clave de depuración: instala, pero no actualiza encima de una versión firmada con otra clave."
+          # Notes: the "## Spotiboost vX.Y.Z" section of CHANGE.md (English and Spanish blocks, the app shows the one in the
+          # user's language). Without an entry, fall back to the commit subjects since the previous tag.
+          awk -v h="## Spotiboost $GITHUB_REF_NAME" '$0==h{p=1;next} /^## /{p=0} p' CHANGE.md > "$RUNNER_TEMP/notes.md"
+          if ! grep -q '[^[:space:]]' "$RUNNER_TEMP/notes.md"; then
+            PREV=$(git describe --tags --abbrev=0 "$GITHUB_REF_NAME^" 2>/dev/null || true)
+            git log --no-merges --pretty='- %s' ${PREV:+"$PREV..$GITHUB_REF_NAME"} > "$RUNNER_TEMP/notes.md"
           fi
-          gh release create "$GITHUB_REF_NAME" "$APK" "$APK.sha256" --title "Spotiboost $VER" --notes "$NOTES"
+          # after the "---" line: only for the GitHub page, the app does not show it
+          {
+            printf '\n---\n'
+            printf 'Install the APK (arm64 only); SHA-256 in the .sha256 file. / Instala el APK (solo arm64); SHA-256 en el archivo .sha256.\n'
+            if [ "$SIGNED" = debug ]; then
+              printf '\nSigned with the debug key: it installs but cannot update over a build signed with another key. / Firmado con la clave de depuración: instala pero no actualiza encima de otra firma.\n'
+            fi
+          } >> "$RUNNER_TEMP/notes.md"
+          gh release create "$GITHUB_REF_NAME" "$APK" "$APK.sha256" --title "Spotiboost $VER" --notes-file "$RUNNER_TEMP/notes.md"
