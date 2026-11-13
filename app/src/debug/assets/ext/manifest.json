@@ -1,0 +1,31 @@
+{
+  "manifest_version": 2,
+  "name": "Spotiboost",
+  "version": "2.0",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "boost@spotiboost.local"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.spotify.com/*"
+      ],
+      "js": [
+        "boost.js",
+        "diag.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "permissions": [
+    "nativeMessaging",
+    "geckoViewAddons"
+  ],
+  "background": {
+    "scripts": [
+      "bg.js"
+    ]
+  }
+}
