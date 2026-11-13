@@ -143,6 +143,7 @@ public class MainActivity extends Activity {
             }
         });
         session.open(runtime);
+        UpdateChecker.check(this);
         view.setSession(session);
         session.loadUri("https://open.spotify.com/");
     }

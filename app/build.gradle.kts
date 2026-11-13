@@ -45,4 +45,5 @@ android {
 dependencies {
     // arm64 only: the phone is arm64 and the universal artifact is ~4x bigger
     implementation("org.mozilla.geckoview:geckoview-arm64-v8a:150.0.20260511200624")
+    implementation("androidx.core:core:1.16.0") // FileProvider: hands the downloaded update to the system installer
 }

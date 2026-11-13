@@ -17,6 +17,8 @@ jobs:
       contents: write   # create the GitHub release on a tag
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0   # tags + history for the release notes
 
       - uses: actions/setup-java@v5
         with:
@@ -64,7 +66,10 @@ jobs:
           APK="Spotiboost-$VER.apk"
           cp app/build/outputs/apk/release/app-release.apk "$APK"
           sha256sum "$APK" > "$APK.sha256"
-          NOTES="Instala el APK (solo arm64). SHA-256 en el archivo .sha256."
+          PREV=$(git describe --tags --abbrev=0 "$GITHUB_REF_NAME^" 2>/dev/null || true)
+          LOG=$(git log --no-merges --pretty='- %s' ${PREV:+"$PREV..$GITHUB_REF_NAME"})
+          NOTES="${LOG:-- Primera versión}"
+          NOTES="$NOTES"$'\n\n---\nInstala el APK (solo arm64). SHA-256 en el archivo .sha256.'
           if [ "$SIGNED" = debug ]; then
             NOTES="$NOTES"$'\n\n'"Firmado con la clave de depuración: instala, pero no actualiza encima de una versión firmada con otra clave."
           fi
