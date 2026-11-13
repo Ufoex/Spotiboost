@@ -1,46 +1,68 @@
 # Spotiboost
 
-Cliente de Android para el reproductor web de Spotify (`open.spotify.com`), pensado como proyecto personal. Carga la web dentro de
-[GeckoView](https://mozilla.github.io/geckoview/) (el motor de Firefox) y le inyecta una extensión que adapta la interfaz a un teléfono.
+**English** · [Español](README.es.md)
 
-No está afiliado a Spotify. Necesitas tu propia cuenta; el audio se reproduce con el DRM Widevine del propio dispositivo.
+## 🙋 Have a problem or a suggestion?
 
-## Qué hace
-- Interfaz móvil: barra inferior (Inicio, Buscar, Biblioteca), reproductor ampliado, cola, dispositivos y letra a pantalla completa.
-- Reproducción en segundo plano y con la pantalla apagada: servicio en primer plano, notificación y controles de la pantalla de bloqueo.
-- Inglés y español, según el idioma del teléfono.
-- Aviso si el ahorro de energía está activo o faltan las notificaciones, porque pueden cortar la música.
+Tell us about it: open an issue and describe what happened or what you would like.
 
-## Por qué GeckoView y no el WebView del sistema
-En el WebView de Android el reproductor web de Spotify no llega a pedir el audio. En GeckoView sí, con tres ajustes
-(permiso de DRM, autoplay y Service Workers desactivados, que rompían las portadas); están comentados en `MainActivity.java`.
+[![Open an issue](https://img.shields.io/badge/Open%20an%20issue-D73A4A?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Ufoex/Spotiboost/issues/new/choose)
 
-## Licencia
-MIT. GeckoView (MPL 2.0) se descarga como dependencia y no se incluye en este repositorio.
+Spotiboost is an Android client for the Spotify web player (`open.spotify.com`). It loads the site inside [GeckoView](https://mozilla.github.io/geckoview/) (Firefox's engine) and injects an extension that adapts the interface to a phone.
 
-## Instalar
-Descarga el APK de [Releases](../../releases). Solo arm64 (casi todos los teléfonos actuales).
+[![Latest release](https://img.shields.io/github/v/release/Ufoex/Spotiboost?label=download)](https://github.com/Ufoex/Spotiboost/releases/latest)
 
-## Compilar
-Requiere JDK 17 y el SDK de Android (plataforma 36).
+<p align="middle">
+    <a href='https://grev.shehryar.ae/?owner=Ufoex&repo=Spotiboost'><img alt='Downloads count' height='40' src='https://img.shields.io/github/downloads/Ufoex/Spotiboost/total?style=for-the-badge&logo=github&label=Downloads&color=1DB954&labelColor=24292F'/></a>
+</p>
+
+📘 Also available: [**Faceboost**](https://github.com/Ufoex/Faceboost), the same idea for Facebook.
+📸 And [**Instaboost**](https://github.com/Ufoex/Instaboost), for Instagram.
+
+## Features
+
+- Mobile interface: bottom bar (Home, Search, Library), expanded player, queue, devices and full-screen lyrics.
+- Background and screen-off playback: foreground service, notification and lock-screen controls.
+- English and Spanish, following the phone's language.
+- Warning when battery saver is on or notifications are missing, since either can cut the music.
+- Update check: the app looks for new releases here and shows the release notes in English or Spanish.
+
+Not affiliated with Spotify. You need your own account; audio plays through the device's own Widevine DRM.
+
+## Why GeckoView and not the system WebView
+
+In Android's WebView the Spotify web player never gets to request the audio. In GeckoView it does, with three tweaks (DRM permission, autoplay, and Service Workers disabled, which broke the covers); they are commented in `MainActivity.java`.
+
+## Install
+
+Download the APK from the [latest release](https://github.com/Ufoex/Spotiboost/releases/latest) and open it. arm64 only (almost all current phones). Later updates can be installed from inside the app.
+
+## Build
+
+Requires JDK 17 and the Android SDK (platform 36).
 
 ```sh
-./gradlew assembleDebug     # app-debug.apk, con depuración y diagnóstico
+./gradlew assembleDebug     # app-debug.apk, with debugging and diagnostics
 ./gradlew assembleRelease   # app-release.apk
 ```
 
-La build debug se instala como "Spotiboost Debug" (`com.ufoex.spotiboost.gecko`), así que convive con la release (`com.ufoex.spotiboost`).
+The debug build installs as "Spotiboost Debug" (`com.ufoex.spotiboost.gecko`), so it coexists with the release (`com.ufoex.spotiboost`).
 
-## Publicar una versión
-1. Añade arriba de `CHANGE.md` una sección `## Spotiboost vX.Y.Z` con los bloques `<!-- lang:en -->` y `<!-- lang:es -->`
-   (son las notas que muestra el release y el aviso de actualización de la app).
-2. Crea la etiqueta y súbela; GitHub Actions pasa los tests, compila y publica el APK en Releases:
+## Publishing a release
+
+1. Add a `## Spotiboost vX.Y.Z` section at the top of `CHANGE.md` with `<!-- lang:en -->` and `<!-- lang:es -->` blocks (these are the notes shown in the release and in the app's update prompt).
+2. Create the tag and push it; GitHub Actions runs the tests, builds and publishes the APK to Releases:
 
 ```sh
 git tag vX.Y.Z && git push origin vX.Y.Z
 ```
 
-La app busca al abrirse la última versión en GitHub y, si es más nueva que la instalada, ofrece descargarla e instalarla.
+On launch the app checks GitHub for the latest version and, if it is newer than the installed one, offers to download and install it.
 
-Para firmar con tu propia clave, define en el repo los secretos `KEYSTORE_BASE64` (`base64 -w0 release.jks`), `KEYSTORE_PASSWORD`,
-`KEY_ALIAS` y `KEY_PASSWORD`. Sin ellos, el release se firma con la clave de depuración: instala, pero no actualiza encima de otra firma.
+To sign with your own key, set the repo secrets `KEYSTORE_BASE64` (`base64 -w0 release.jks`), `KEYSTORE_PASSWORD`, `KEY_ALIAS` and `KEY_PASSWORD`. Without them the release is signed with the debug key: it installs, but won't update over another signature.
+
+## License
+
+MIT. GeckoView (MPL 2.0) is downloaded as a dependency and is not included in this repository.
+
+Spotiboost is not affiliated with or endorsed by Spotify. Spotify is a trademark of Spotify AB.
