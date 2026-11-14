@@ -5,12 +5,14 @@
 
 - **Experimental:** audio ad blocker. When an ad starts, it is muted and played out at once, so the next song starts within a second or two. It relies on Spotify's internal player objects, so a Spotify update may break it; the app keeps working normally if it does.
 - It only covers audio ads. Banners and other visual ads are not hidden yet.
+- The update prompt has a new Spotify-style look and shows a progress bar with the percentage while the APK downloads.
 
 <!-- lang:es -->
 ### Novedades
 
 - **Experimental:** bloqueador de anuncios de audio. Cuando empieza un anuncio se silencia y se reproduce de golpe, así la siguiente canción arranca en uno o dos segundos. Depende de objetos internos del reproductor de Spotify, así que una actualización de Spotify puede romperlo; si pasa, la app sigue funcionando con normalidad.
 - Solo cubre anuncios de audio. Los banners y otros anuncios visuales aún no se ocultan.
+- El aviso de actualización tiene un nuevo diseño al estilo Spotify y muestra una barra de progreso con el porcentaje mientras se descarga el APK.
 
 ## Spotiboost v0.1.2
 

@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.InsetDrawable;
 import android.net.Uri;
 import android.provider.Settings;
 import android.text.SpannableStringBuilder;
@@ -14,6 +16,9 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.text.style.URLSpan;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +33,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Locale;
+import java.util.function.IntConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -126,17 +132,27 @@ final class UpdateChecker {
     }
 
     private static void dialog(Activity a, String version, String current, String apk, String notes) {
-        SpannableStringBuilder msg = new SpannableStringBuilder(a.getString(R.string.update_available_desc, version, current));
-        if (!notes.isEmpty()) msg.append("\n\n").append(render(notes));
-        AlertDialog d = new AlertDialog.Builder(a, android.R.style.Theme_Material_Dialog_Alert)
-                .setTitle(R.string.update_available_title)
-                .setMessage(msg)
-                .setPositiveButton(R.string.update_install, null)   // set below: must not auto-dismiss while downloading
-                .setNegativeButton(R.string.update_later, null)
-                .show();
-        TextView body = d.findViewById(android.R.id.message);
-        if (body != null) body.setMovementMethod(LinkMovementMethod.getInstance());   // links in the notes
-        d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+        View v = a.getLayoutInflater().inflate(R.layout.dialog_update, null);
+        TextView title = v.findViewById(R.id.up_title), desc = v.findViewById(R.id.up_desc), body = v.findViewById(R.id.up_notes);
+        View scroll = v.findViewById(R.id.up_scroll);
+        ProgressBar bar = v.findViewById(R.id.up_bar);
+        Button later = v.findViewById(R.id.up_later), install = v.findViewById(R.id.up_install);
+        title.setText(R.string.update_available_title);
+        desc.setText(a.getString(R.string.update_available_desc, version, current));
+        body.setText(render(notes));
+        body.setMovementMethod(LinkMovementMethod.getInstance());   // links in the notes
+        scroll.setVisibility(notes.isEmpty() ? View.GONE : View.VISIBLE);
+        // long notes scroll instead of pushing the buttons off screen
+        int max = a.getResources().getDisplayMetrics().heightPixels * 2 / 5;
+        scroll.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            if (scroll.getHeight() > max) { scroll.getLayoutParams().height = max; scroll.requestLayout(); }
+        });
+        AlertDialog d = new AlertDialog.Builder(a).setView(v).create();
+        // the card draws its own rounded background; the transparent inset keeps it off the screen edges
+        int margin = (int) (16 * a.getResources().getDisplayMetrics().density);
+        d.getWindow().setBackgroundDrawable(new InsetDrawable(new ColorDrawable(0), margin));
+        later.setOnClickListener(x -> d.dismiss());
+        install.setOnClickListener(x -> {
             // First time Android needs the user to allow this app to install APKs.
             if (!a.getPackageManager().canRequestPackageInstalls()) {
                 a.startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + a.getPackageName())));
@@ -145,11 +161,19 @@ final class UpdateChecker {
                 return;
             }
             d.setCancelable(false);
-            d.setMessage(a.getString(R.string.update_downloading));
-            d.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-            d.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(false);
+            scroll.setVisibility(View.GONE);
+            desc.setText(R.string.update_downloading);
+            install.setEnabled(false);
+            install.setAlpha(0.4f);
+            later.setEnabled(false);
+            bar.setIndeterminate(true);   // until the size is known
+            bar.setVisibility(View.VISIBLE);
             new Thread(() -> {
-                boolean ok = download(a, apk);
+                boolean ok = download(a, apk, pct -> a.runOnUiThread(() -> {
+                    bar.setIndeterminate(false);
+                    bar.setProgress(pct);
+                    desc.setText(a.getString(R.string.update_downloading) + " " + pct + "%");
+                }));
                 a.runOnUiThread(() -> {
                     d.dismiss();
                     if (!ok) {
@@ -159,10 +183,11 @@ final class UpdateChecker {
                 });
             }).start();
         });
+        d.show();
     }
 
-    /** Downloads the APK and hands it to the system installer. */
-    private static boolean download(Activity a, String url) {
+    /** Downloads the APK (reporting whole percents) and hands it to the system installer. */
+    private static boolean download(Activity a, String url, IntConsumer progress) {
         try {
             File f = new File(a.getCacheDir(), "updates/update.apk");
             f.getParentFile().mkdirs();
@@ -170,9 +195,16 @@ final class UpdateChecker {
             c.setConnectTimeout(10000);
             c.setReadTimeout(30000);
             if (c.getResponseCode() != 200) return false;
+            long total = c.getContentLengthLong(), done = 0;
+            int shown = -1;
             try (InputStream in = c.getInputStream(); FileOutputStream out = new FileOutputStream(f)) {
                 byte[] buf = new byte[65536];
-                for (int n; (n = in.read(buf)) > 0; ) out.write(buf, 0, n);
+                for (int n; (n = in.read(buf)) > 0; ) {
+                    out.write(buf, 0, n);
+                    done += n;
+                    int pct = total > 0 ? (int) (done * 100 / total) : -1;
+                    if (pct != shown && pct >= 0) { shown = pct; progress.accept(pct); }
+                }
             }
             Uri uri = FileProvider.getUriForFile(a, a.getPackageName() + ".fileprovider", f);
             a.startActivity(new Intent(Intent.ACTION_VIEW).setDataAndType(uri, "application/vnd.android.package-archive")
