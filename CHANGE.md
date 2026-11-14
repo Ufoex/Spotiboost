@@ -1,3 +1,17 @@
+## Spotiboost v0.1.3
+
+<!-- lang:en -->
+### What's new
+
+- **Experimental:** audio ad blocker. When an ad starts, it is muted and played out at once, so the next song starts within a second or two. It relies on Spotify's internal player objects, so a Spotify update may break it; the app keeps working normally if it does.
+- It only covers audio ads. Banners and other visual ads are not hidden yet.
+
+<!-- lang:es -->
+### Novedades
+
+- **Experimental:** bloqueador de anuncios de audio. Cuando empieza un anuncio se silencia y se reproduce de golpe, así la siguiente canción arranca en uno o dos segundos. Depende de objetos internos del reproductor de Spotify, así que una actualización de Spotify puede romperlo; si pasa, la app sigue funcionando con normalidad.
+- Solo cubre anuncios de audio. Los banners y otros anuncios visuales aún no se ocultan.
+
 ## Spotiboost v0.1.2
 
 <!-- lang:en -->

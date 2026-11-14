@@ -1,6 +1,8 @@
 (function () {
   if (window.__sbBoost) return;
   window.__sbBoost = 1;
+  // page.js has to run in the page's own context to reach Spotify's internals
+  var pg = document.createElement('script'); pg.src = browser.runtime.getURL('page.js'); (document.head || document.documentElement).appendChild(pg);
   // UI text of the injected interface, in the phone's language (Spotify's own text already follows the account).
   var TXT = {
     es: { home: 'Inicio', search: 'Buscar', library: 'Biblioteca', nowPlaying: 'En reproducci\u00f3n', close: 'Cerrar', like: 'Me gusta',

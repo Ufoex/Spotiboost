@@ -27,5 +27,8 @@
     "scripts": [
       "bg.js"
     ]
-  }
+  },
+  "web_accessible_resources": [
+    "page.js"
+  ]
 }
