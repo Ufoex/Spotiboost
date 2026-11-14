@@ -1,23 +1,19 @@
-# Spotiboost
+<h1 align="center">Spotiboost</h1>
 
-[English](README.md) · **Español**
+<p align="center">Cliente de Android para el reproductor web de Spotify, con reproducción en segundo plano.</p>
 
-## 🙋 ¿Tienes un problema o una sugerencia?
+<p align="center"><a href="README.md">English</a> · <b>Español</b></p>
 
-Cuéntanos: abre un issue y describe qué pasó o qué te gustaría.
-
-[![Abrir un issue](https://img.shields.io/badge/Abrir%20un%20issue-D73A4A?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Ufoex/Spotiboost/issues/new/choose)
-
-Spotiboost es un cliente de Android para el reproductor web de Spotify (`open.spotify.com`). Carga la web dentro de [GeckoView](https://mozilla.github.io/geckoview/) (el motor de Firefox) y le inyecta una extensión que adapta la interfaz a un teléfono.
-
-[![Última versión](https://img.shields.io/github/v/release/Ufoex/Spotiboost?label=descargar)](https://github.com/Ufoex/Spotiboost/releases/latest)
-
-<p align="middle">
-    <a href='https://grev.shehryar.ae/?owner=Ufoex&repo=Spotiboost'><img alt='Conteo de descargas' height='40' src='https://img.shields.io/github/downloads/Ufoex/Spotiboost/total?style=for-the-badge&logo=github&label=Downloads&color=1DB954&labelColor=24292F'/></a>
+<p align="center">
+    <a href='https://github.com/Ufoex/Spotiboost/releases/latest'><img alt='Descargar' height='40' src='https://img.shields.io/github/v/release/Ufoex/Spotiboost?style=for-the-badge&logo=github&label=Descargar&color=1DB954&labelColor=24292F'/></a> <a href='https://grev.shehryar.ae/?owner=Ufoex&repo=Spotiboost'><img alt='Downloads' height='40' src='https://img.shields.io/github/downloads/Ufoex/Spotiboost/total?style=for-the-badge&logo=github&label=Downloads&color=1DB954&labelColor=24292F'/></a> <a href='https://github.com/Ufoex/Spotiboost/issues/new/choose'><img alt='Abrir un issue' height='40' src='https://img.shields.io/badge/Abrir%20un%20issue-D73A4A?style=for-the-badge&logo=github&logoColor=white'/></a> <a href='https://buymeacoffee.com/masterllamk'><img alt='Invítame un café' height='40' src='https://img.shields.io/badge/Inv%C3%ADtame%20un%20caf%C3%A9-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black'/></a>
 </p>
 
-📘 También disponible: [**Faceboost**](https://github.com/Ufoex/Faceboost), la misma idea para Facebook.
-📸 Y [**Instaboost**](https://github.com/Ufoex/Instaboost), para Instagram.
+<p align="center">
+    📘 También disponible: <a href='https://github.com/Ufoex/Faceboost'><b>Faceboost</b></a>, la misma idea para Facebook.<br>
+    📸 Y <a href='https://github.com/Ufoex/Instaboost'><b>Instaboost</b></a>, para Instagram.
+</p>
+
+Spotiboost es un cliente de Android para el reproductor web de Spotify (`open.spotify.com`). Carga la web dentro de [GeckoView](https://mozilla.github.io/geckoview/) (el motor de Firefox) y le inyecta una extensión que adapta la interfaz a un teléfono.
 
 ## Funciones
 
@@ -60,6 +56,10 @@ git tag vX.Y.Z && git push origin vX.Y.Z
 La app busca al abrirse la última versión en GitHub y, si es más nueva que la instalada, ofrece descargarla e instalarla.
 
 Para firmar con tu propia clave, define en el repo los secretos `KEYSTORE_BASE64` (`base64 -w0 release.jks`), `KEYSTORE_PASSWORD`, `KEY_ALIAS` y `KEY_PASSWORD`. Sin ellos, el release se firma con la clave de depuración: instala, pero no actualiza encima de otra firma.
+
+## Apoyo
+
+La app es gratis y no tiene anuncios. Si te sirve y quieres dar las gracias, puedes [invitarme un café](https://buymeacoffee.com/masterllamk).
 
 ## Licencia
 
