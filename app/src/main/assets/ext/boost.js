@@ -86,8 +86,15 @@
     body.sb-lyrics ${GRID} > div:has([data-testid="lyrics-line"]) div:has([data-testid="lyrics-line"]) {
       position: static !important; width: 100% !important; min-width: 0 !important; max-width: 100% !important;
       height: auto !important; transform: none !important; overflow: visible !important; box-sizing: border-box;
+      padding-top: 0 !important; margin-top: 0 !important; /* desktop layout reserved ~270px above the lines */
     }
+    /* only the wrapper right above the lines keeps room for the (absolute) header, as a % of the screen height */
+    body.sb-lyrics ${GRID} > div:has([data-testid="lyrics-line"]) div:has(> div > [data-testid="lyrics-line"]) { padding-top: 15vh !important; }
+    body.sb-lyrics ${GRID} > div:has([data-testid="lyrics-line"]) div:has(> [data-testid="lyrics-line"]) > :not([data-testid="lyrics-line"]) { padding: 0 20px; margin-top: 0 !important; box-sizing: border-box; }
     body.sb-lyrics [data-testid="lyrics-line"] { width: auto !important; padding: 0 20px; box-sizing: border-box; }
+    /* fullscreen lyrics (Spotify's own button): the sheet takes the whole screen, over top bar, player bar and nav */
+    body:fullscreen.sb-lyrics ${GRID} > div:has([data-testid="lyrics-line"]) { top: 0 !important; bottom: 0 !important; z-index: 90; }
+    body:fullscreen #sb-nav { display: none; }
     /* the panel's overlay scrollbars are empty flex siblings of the content and would split the row: the sheet scrolls natively */
     body.sb-panel #main-view + div .os-scrollbar { display: none !important; }
     /* player bar: [cover+title | prev play next] on top, progress underneath, extras (lyrics, volume...) dropped */
@@ -203,8 +210,8 @@
         /playlist|gusta|liked|saved|guardad|agregar|quitar|add to|remove from/i.test(x.getAttribute('aria-label') || ''); })[0],
       range: q1('[data-testid="playback-progressbar"] input[type=range]', b),
       pos: q1('[data-testid="playback-position"]', b), dur: q1('[data-testid="playback-duration"]', b),
-      title: q1('[data-testid="context-item-link"]', b), artist: q1('[data-testid="context-item-info-artist"]', b),
-      img: q1('[data-testid="now-playing-widget"] img', b)
+      title: q1('[data-testid="context-item-link"]', b), artist: q1('[data-testid="context-item-info-artist"], [data-testid="now-playing-widget-v2-byline"]', b),
+      img: q1('[data-testid^="now-playing-widget"] img', b)
     };
   }
   function hasNpUi() { return !!q1('#sb-np'); }
@@ -294,7 +301,7 @@
   window.addEventListener('popstate', function () { document.body.classList.remove('sb-np-open'); });
   // tap the cover/title in the bar -> expand (the like button and the other bar buttons keep working)
   document.addEventListener('click', function (e) {
-    var t = e.target; if (!t.closest || !t.closest('[data-testid="now-playing-widget"]')) return;
+    var t = e.target; if (!t.closest || !t.closest('[data-testid^="now-playing-widget"]')) return;
     var b = t.closest('button'); if (b && !/cover-art-button/.test(b.dataset.testid || '')) return;
     e.preventDefault(); e.stopPropagation(); openNp();
   }, true);

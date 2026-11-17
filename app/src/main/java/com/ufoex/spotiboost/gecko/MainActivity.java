@@ -24,6 +24,7 @@ public class MainActivity extends Activity {
     private static org.mozilla.geckoview.GeckoResult<WebExtension> extension;
     private GeckoSession session;
     private boolean canGoBack;
+    private boolean fullScreen;         // the page asked for element fullscreen (e.g. Spotify's lyrics fullscreen button)
     private volatile boolean overlay;   // a sheet (now playing / devices / queue) is up in the page
     private WebExtension.Port port;
     private PowerSaveWarning powerSave;
@@ -72,6 +73,18 @@ public class MainActivity extends Activity {
                 .userAgentMode(GeckoSessionSettings.USER_AGENT_MODE_DESKTOP)
                 .viewportMode(GeckoSessionSettings.VIEWPORT_MODE_MOBILE)
                 .build());
+        // Without this delegate Gecko ignores requestFullscreen(): hide the system bars while the page is fullscreen.
+        session.setContentDelegate(new GeckoSession.ContentDelegate() {
+            @Override
+            @SuppressWarnings("deprecation")
+            public void onFullScreen(GeckoSession s, boolean on) {
+                fullScreen = on;
+                getWindow().getDecorView().setSystemUiVisibility(on
+                        ? android.view.View.SYSTEM_UI_FLAG_FULLSCREEN | android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                          | android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        : android.view.View.SYSTEM_UI_FLAG_VISIBLE);
+            }
+        });
         session.setNavigationDelegate(new GeckoSession.NavigationDelegate() {
             @Override
             public void onCanGoBack(GeckoSession s, boolean can) { canGoBack = can; }
@@ -190,7 +203,8 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (overlay && port != null) {
+        if (fullScreen) session.exitFullScreen();
+        else if (overlay && port != null) {
             try { port.postMessage(new org.json.JSONObject().put("back", true)); } catch (org.json.JSONException ignored) {}
         } else if (canGoBack) session.goBack(); else super.onBackPressed();
     }

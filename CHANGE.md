@@ -1,3 +1,19 @@
+## Spotiboost v0.1.4
+
+<!-- lang:en -->
+### What's new
+
+- Fixed the full-screen "now playing" view: Spotify renamed part of its player bar, so tapping the cover no longer opened it. The view, and its devices, lyrics and queue buttons, work again.
+- Lyrics: removed the big empty gap above the lines; the spacing now scales with the screen height.
+- The full-screen button on the lyrics now works: the lyrics fill the whole screen and Back leaves full screen.
+
+<!-- lang:es -->
+### Novedades
+
+- Corregida la vista de reproducción a pantalla completa: Spotify renombró una parte de su barra del reproductor y al tocar la portada ya no se abría. La vista y sus botones de dispositivos, letra y cola funcionan de nuevo.
+- Letras: se quitó el gran espacio vacío sobre la letra; el espaciado ahora se adapta a la altura de la pantalla.
+- El botón de pantalla completa de la letra ya funciona: la letra ocupa toda la pantalla y Atrás sale de ella.
+
 ## Spotiboost v0.1.3
 
 <!-- lang:en -->
