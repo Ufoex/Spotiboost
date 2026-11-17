@@ -7,10 +7,10 @@
   var TXT = {
     es: { home: 'Inicio', search: 'Buscar', library: 'Biblioteca', nowPlaying: 'En reproducci\u00f3n', close: 'Cerrar', like: 'Me gusta',
           shuffle: 'Aleatorio', prev: 'Anterior', play: 'Reproducir', next: 'Siguiente', repeat: 'Repetir',
-          devices: 'Dispositivos', lyrics: 'Letra', queue: 'Cola' },
+          devices: 'Dispositivos', lyrics: 'Letra', queue: 'Cola', noLyrics: 'Sin letra' },
     en: { home: 'Home', search: 'Search', library: 'Library', nowPlaying: 'Now playing', close: 'Close', like: 'Like',
           shuffle: 'Shuffle', prev: 'Previous', play: 'Play', next: 'Next', repeat: 'Repeat',
-          devices: 'Devices', lyrics: 'Lyrics', queue: 'Queue' }
+          devices: 'Devices', lyrics: 'Lyrics', queue: 'Queue', noLyrics: 'No lyrics' }
   };
   var L = /^es/i.test(navigator.language || '') ? TXT.es : TXT.en;
   function t(k) { return L[k]; }
@@ -89,12 +89,49 @@
       padding-top: 0 !important; margin-top: 0 !important; /* desktop layout reserved ~270px above the lines */
     }
     /* only the wrapper right above the lines keeps room for the (absolute) header, as a % of the screen height */
-    body.sb-lyrics ${GRID} > div:has([data-testid="lyrics-line"]) div:has(> div > [data-testid="lyrics-line"]) { padding-top: 15vh !important; }
+    body.sb-lyrics ${GRID} > div:has([data-testid="lyrics-line"]) div:has(> div > [data-testid="lyrics-line"]) { padding-top: calc(var(--sb-hd, 9vh) + 1vh) !important; }
     body.sb-lyrics ${GRID} > div:has([data-testid="lyrics-line"]) div:has(> [data-testid="lyrics-line"]) > :not([data-testid="lyrics-line"]) { padding: 0 20px; margin-top: 0 !important; box-sizing: border-box; }
     body.sb-lyrics [data-testid="lyrics-line"] { width: auto !important; padding: 0 20px; box-sizing: border-box; }
+    /* Spotify balances the wrapped lines (~55% of the width): use the whole row instead */
+    body.sb-lyrics [data-testid="lyrics-line"], body.sb-lyrics [data-testid="lyrics-line"] * { text-wrap: wrap !important; }
+    /* lyrics header (marked by boost.js): title on its own row, icons below; the "switch to video" label is dropped */
+    .sb-hd { flex-wrap: wrap !important; row-gap: 4px; }
+    .sb-hd > :first-child { flex: 1 0 100% !important; width: auto !important; }
+    .sb-hd button > span:not(:has(svg)) { display: none !important; }
+    .sb-hd * { min-width: 0 !important; } /* the video button's wrapper reserves 156px even without its label */
+    .sb-hd button:has(> span:not(:has(svg))) { padding-left: 12px; padding-right: 12px; }
     /* fullscreen lyrics (Spotify's own button): the sheet takes the whole screen, over top bar, player bar and nav */
-    body:fullscreen.sb-lyrics ${GRID} > div:has([data-testid="lyrics-line"]) { top: 0 !important; bottom: 0 !important; z-index: 90; }
+    body:fullscreen.sb-lyrics ${GRID} > div:has([data-testid="lyrics-line"]) { top: 0 !important; bottom: 0 !important; margin-top: 0 !important; z-index: 90; } /* Spotify gives it margin-top: -56px here */
     body:fullscreen #sb-nav { display: none; }
+    /* drawn under the status bar / camera cutout now: keep the header buttons clear of it (safe area, or ~4% of the height) */
+    body:fullscreen .sb-hd { margin-top: max(env(safe-area-inset-top, 0px), 4vh); }
+    body:fullscreen.sb-lyrics ${GRID} > div:has([data-testid="lyrics-line"]) div:has(> div > [data-testid="lyrics-line"]) { padding-top: calc(var(--sb-hd, 9vh) + max(env(safe-area-inset-top, 0px), 4vh) + 1vh) !important; }
+    /* "no lyrics" notice (built by boost.js): dimmed, blurred cover behind a centred message, same slot as the lyrics sheet */
+    #sb-nolyr { display: none; position: fixed; left: 0; right: 0; top: 56px; bottom: calc(96px + var(--sb-nav)); z-index: 66;
+      align-items: center; justify-content: center; background: #121212 center / cover no-repeat; color: #fff; font-size: 22px; font-weight: 800; }
+    #sb-nolyr::before { content: ""; position: absolute; inset: 0; background: linear-gradient(#121212cc, #121212f2); backdrop-filter: blur(24px); }
+    #sb-nolyr span { position: relative; }
+    body.sb-nolyr #sb-nolyr { display: flex; }
+    /* Spotify adds an empty spacer (about a screen tall) after the lines so the last one can reach the middle: keep a sliver */
+    body.sb-lyrics ${GRID} > div:has([data-testid="lyrics-line"]) div:has([data-testid="lyrics-line"]) + div:not(:has([data-testid="lyrics-line"])) { height: 4vh !important; min-height: 0 !important; }
+    /* signed-out "sample of Spotify" banner: the text column was squeezed to 106px by the wide button, making it a screen tall */
+    [data-testid="signup-bar"] { align-items: center; gap: 10px; }
+    [data-testid="signup-bar"] > div:first-child { flex: 1 1 0 !important; min-width: 0 !important; width: auto !important; }
+    [data-testid="signup-bar"] > div:first-child p { font-size: 12px !important; line-height: 1.3 !important; margin: 0; }
+    [data-testid="signup-bar"] > div:first-child p:first-child { font-size: 11px !important; font-weight: 700; }
+    [data-testid="signup-bar"] button > span { flex: none !important; padding: 8px 14px !important; font-size: 14px !important; white-space: nowrap; }
+    /* signed out: the player part of the bar is disabled (and its volume spills off the screen): keep only the banner */
+    [data-testid="now-playing-bar"]:has([data-testid="signup-bar"]) > :not([data-testid="signup-bar"]):not(:has([data-testid="signup-bar"])) { display: none !important; }
+    /* hover tooltips ("Anterior", "Salir de pantalla completa"...): meaningless on touch, and they linger over the buttons after a tap */
+    div[id^="tippy-"]:has([data-testid="hover-or-focus-tooltip"]) { display: none !important; }
+    /* loading: a broken ring spins on the play buttons while the player waits for audio (body.sb-buf, set by page.js).
+       page.js adds the class only after 250ms of waiting. */
+    @keyframes sb-spin { to { transform: rotate(360deg); } }
+    [data-testid="control-button-playpause"], #sb-np .sb-play { position: relative; }
+    body.sb-buf [data-testid="control-button-playpause"] svg, body.sb-buf #sb-np .sb-play svg { opacity: 0; }
+    body.sb-buf [data-testid="control-button-playpause"]::after, body.sb-buf #sb-np .sb-play::after {
+      content: ""; position: absolute; inset: 24%; box-sizing: border-box; border-radius: 50%; pointer-events: none;
+      border: 3px solid #0003; border-top-color: #000; animation: sb-spin .8s linear infinite; }
     /* the panel's overlay scrollbars are empty flex siblings of the content and would split the row: the sheet scrolls natively */
     body.sb-panel #main-view + div .os-scrollbar { display: none !important; }
     /* player bar: [cover+title | prev play next] on top, progress underneath, extras (lyrics, volume...) dropped */
@@ -167,20 +204,7 @@
     b.onclick = function () { document.body.classList.toggle('sb-lib'); };
     bar.insertBefore(b, bar.firstChild);
   }
-  // Social logins don't work in an embedded WebView (Google answers 403 disallowed_useragent), so hide them on
-  // Spotify's login pages. Spotify's own links are /login/<provider>; text is the fallback.
-  function hideSocial() {
-    if (!/(^|\.)accounts\.spotify\.com$/.test(location.hostname)) return;
-    document.querySelectorAll('a, button, [role=button]').forEach(function (e) {
-      if (e.style.display === 'none') return;
-      var t = (e.textContent || '').trim();
-      if (/\/login\/(google|facebook|apple)\b/.test(e.getAttribute('href') || '') ||
-          (t.length < 50 && /google|facebook|apple/i.test(t + ' ' + (e.getAttribute('aria-label') || '')))) {
-        e.style.display = 'none';
-      }
-    });
-  }
-  function onMutate() { addBtn(); hideSocial(); }
+  function onMutate() { addBtn(); }
 
   // ---- expanded "now playing" sheet: mirrors the bar's state, drives the bar's own buttons
   var IC = {
@@ -340,6 +364,7 @@
   }
   // Spotify keeps the library in a collapsed icon rail unless its own toggle ("Abre Tu biblioteca") is pressed
   var lastExpand = 0;
+  var noLyrSince = 0;
   function expandLibrary() {
     var lib = q1('#Desktop_LeftSidebar_Id'); if (!lib || !document.body.classList.contains('sb-lib')) return;
     var t = lib.querySelector('button');
@@ -352,6 +377,26 @@
     var on = function (x) { return !!x && x.getAttribute('aria-pressed') === 'true'; };
     document.body.classList.toggle('sb-panel', on(o.queue) || on(o.connect));
     document.body.classList.toggle('sb-lyrics', on(o.lyrics));
+    // lyrics panel open but nothing to show for 1.5 s (a song without lyrics): say so instead of a black screen
+    var lyrOn = document.body.classList.contains('sb-lyrics'), hasLines = !!q1('[data-testid="lyrics-line"]');
+    if (!lyrOn || hasLines) noLyrSince = 0; else if (!noLyrSince) noLyrSince = Date.now();
+    var showNo = lyrOn && !hasLines && Date.now() - noLyrSince > 1500;
+    if (showNo && !q1('#sb-nolyr')) {
+      var nl = document.createElement('div'); nl.id = 'sb-nolyr'; nl.innerHTML = '<span>' + t('noLyrics') + '</span>'; document.body.appendChild(nl);
+    }
+    document.body.classList.toggle('sb-nolyr', showNo);
+    if (showNo && o.img) {
+      var cover = (o.img.currentSrc || o.img.src).replace(/(ab67616d0000)[0-9a-f]{4}/, '$1b273'), nlEl = q1('#sb-nolyr');
+      if (nlEl && nlEl.dataset.s !== cover) { nlEl.dataset.s = cover; nlEl.style.backgroundImage = 'url("' + cover + '")'; }
+    }
+    // the lyrics header is an absolutely positioned sibling of the lines' wrappers, inside the fixed sheet
+    var ln = document.body.classList.contains('sb-lyrics') && q1('[data-testid="lyrics-line"]');
+    for (var a = ln; a && a !== document.body && a.parentElement && getComputedStyle(a).position !== 'fixed'; a = a.parentElement) {
+      [].forEach.call(a.parentElement.children, function (k) {
+        if (k !== a && !k.classList.contains('sb-hd') && getComputedStyle(k).position === 'absolute' && k.querySelector('button')) k.classList.add('sb-hd');
+        if (k.classList.contains('sb-hd')) document.body.style.setProperty('--sb-hd', k.offsetHeight + 'px'); // lyrics start right under it
+      });
+    }
     report();
   }, 400);
   if (!apply()) document.addEventListener('DOMContentLoaded', apply);

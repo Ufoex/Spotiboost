@@ -24,6 +24,7 @@ public class MainActivity extends Activity {
     private static org.mozilla.geckoview.GeckoResult<WebExtension> extension;
     private GeckoSession session;
     private boolean canGoBack;
+    private FrameLayout root;
     private boolean fullScreen;         // the page asked for element fullscreen (e.g. Spotify's lyrics fullscreen button)
     private volatile boolean overlay;   // a sheet (now playing / devices / queue) is up in the page
     private WebExtension.Port port;
@@ -36,12 +37,14 @@ public class MainActivity extends Activity {
         super.onCreate(b);
         powerSave = new PowerSaveWarning(this);
         GeckoView view = new GeckoView(this);
-        FrameLayout root = new FrameLayout(this);
+        root = new FrameLayout(this);
         root.setBackgroundColor(0xFF121212);
+        view.setAutofillEnabled(true);   // Android's autofill service (Google / Bitwarden...) fills saved logins
         root.addView(view);
         setContentView(root);
         root.setOnApplyWindowInsetsListener((v, in) -> {
-            v.setPadding(in.getSystemWindowInsetLeft(), in.getSystemWindowInsetTop(),
+            if (fullScreen) v.setPadding(0, 0, 0, 0);   // real fullscreen: the page draws under the status bar / camera cutout
+            else v.setPadding(in.getSystemWindowInsetLeft(), in.getSystemWindowInsetTop(),
                     in.getSystemWindowInsetRight(), in.getSystemWindowInsetBottom());
             return in;
         });
@@ -82,7 +85,14 @@ public class MainActivity extends Activity {
                 getWindow().getDecorView().setSystemUiVisibility(on
                         ? android.view.View.SYSTEM_UI_FLAG_FULLSCREEN | android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                           | android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                          | android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         : android.view.View.SYSTEM_UI_FLAG_VISIBLE);
+                // without this the notch / camera cutout stays a black bar in portrait
+                android.view.WindowManager.LayoutParams lp = getWindow().getAttributes();
+                lp.layoutInDisplayCutoutMode = on ? android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                        : android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT;
+                getWindow().setAttributes(lp);
+                root.requestApplyInsets();
             }
         });
         session.setNavigationDelegate(new GeckoSession.NavigationDelegate() {

@@ -1,3 +1,29 @@
+## Spotiboost v0.1.5
+
+<!-- lang:en -->
+### What's new
+
+- Lyrics: no more big empty gaps above or below the lines, the lines use the full width, and the header fits the screen. Songs without lyrics show "No lyrics" over the dimmed cover instead of a black screen.
+- Lyrics full screen now really is full screen: no black bar on top, the header sits clear of the camera, and Back leaves it.
+- Fixed the full-screen "now playing" view, which stopped opening after a Spotify change.
+- Only one Spotify Connect session: if the previous run is still listed as the active device, playback is pulled to the current one, so "Web Player (Firefox)" no longer shows up twice.
+- Sign in with Google, Facebook or Apple is available again, and the system's autofill can fill in saved logins.
+- Signed-out home: the "Sample of Spotify" banner is compact and the disabled player is hidden.
+- Hover tooltips are gone, they only got in the way on a touch screen.
+- A spinner shows on the play button while a song is loading.
+
+<!-- lang:es -->
+### Novedades
+
+- Letras: sin grandes espacios vacíos arriba ni abajo de la letra, las líneas usan todo el ancho y la cabecera cabe en la pantalla. Las canciones sin letra muestran "Sin letra" sobre la portada oscurecida en vez de una pantalla negra.
+- La pantalla completa de la letra ahora sí es pantalla completa: sin barra negra arriba, la cabecera queda libre de la cámara y Atrás sale de ella.
+- Corregida la vista de reproducción a pantalla completa, que dejó de abrirse tras un cambio de Spotify.
+- Una sola sesión de Spotify Connect: si la ejecución anterior sigue como dispositivo activo, la reproducción se trae a la actual, así "Web Player (Firefox)" ya no aparece dos veces.
+- Vuelve a estar disponible el inicio de sesión con Google, Facebook o Apple, y el autocompletado del sistema puede rellenar los datos guardados.
+- Inicio sin sesión: el banner "Muestra de Spotify" es compacto y se oculta el reproductor deshabilitado.
+- Se quitaron los globos de ayuda al pasar el cursor, que solo estorbaban en pantalla táctil.
+- Aparece un indicador de carga en el botón de play mientras una canción se está cargando.
+
 ## Spotiboost v0.1.4
 
 <!-- lang:en -->

@@ -28,6 +28,29 @@
     const touched = new Set();
     let since = 0;
     log('ready v' + p.version);
+    // body.sb-buf while the player waits for audio: boost.js draws a spinner on the play buttons
+    let bufSince = 0;   // only after 250ms, so a quick start does not flash the spinner
+    setInterval(() => {
+      const st = player._state;
+      if (st && st.isBuffering && !st.isPaused) bufSince = bufSince || Date.now(); else bufSince = 0;
+      const b = !!bufSince && Date.now() - bufSince > 250;
+      if (document.body.classList.contains('sb-buf') !== b) document.body.classList.toggle('sb-buf', b);
+    }, 100);
+    // Every page load registers a new Connect device ("Web Player (Firefox)") and the one from the previous run lingers,
+    // often still marked active: Play would then drive a dead session. Once, at start, pull playback to this session.
+    const get = n => reg.resolve([...reg._map.keys()].find(k => k.description === n));
+    let tries = 0;
+    const pull = setInterval(() => {
+      try {
+        const devs = get('ConnectDevicesAPI').getDevices(), me = devs.find(d => d.isLocal), act = devs.find(d => d.isActive);
+        if (!me && ++tries < 30) return;
+        clearInterval(pull);
+        if (me && act && !act.isLocal && act.name === me.name) {
+          log('stale session', act.id.slice(0, 8), 'is active: pulling playback here');
+          get('ConnectTransferAPI').pullToLocalDevice({}).then(() => log('pulled'), e => log('pull failed', e && e.message));
+        }
+      } catch (e) { clearInterval(pull); log('pull check failed', e.message); }
+    }, 1000);
     setInterval(() => {
       if (!isAd()) {
         if (since) { log('ad over after', Date.now() - since, 'ms'); since = 0; }
